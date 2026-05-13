@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>POLIKLINIK | Excelencia Médica en Lanzarote</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --primary: #0A1929;
+      --primary-light: #1A3A52;
+      --accent: #C9A961;
+      --surface: #F8F9FA;
+      --surface-dark: #E9ECEF;
+      --text: #1A1A1A;
+      --text-light: #6C757D;
+      --white: #FFFFFF;
+      --gradient-gold: linear-gradient(135deg, #C9A961 0%, #F4E5C2 50%, #C9A961 100%);
+      --gradient-dark: linear-gradient(135deg, #0A1929 0%, #1A3A52 100%);
+      --shadow-elevated: 0 24px 64px rgba(10, 25, 41, 0.15);
+      --shadow-dramatic: 0 40px 120px rgba(10, 25, 41, 0.3);
+      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-2xl: 32px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ===== CURSOR ===== */
+    .cursor {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      mix-blend-mode: difference;
+    }
+    .cursor.hover { transform: scale(2); background: var(--accent); }
+    .cursor-follower {
+      width: 32px;
+      height: 32px;
+      background: rgba(201, 169, 97, 0.15);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 99998;
+      transition: transform 0.15s ease-out;
+    }
+
+    /* ===== PRELOADER ===== */
+    .preloader {
+      position: fixed;
+      inset: 0;
+      background: var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100000;
+    }
+    .preloader.hidden { transform: translateY(-100%); transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1); }
+    .preloader-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      color: var(--accent);
+      letter-spacing: 0.2em;
+    }
+    .preloader-bar {
+      width: 180px;
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      margin-top: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .preloader-progress {
+      position: absolute;
+      left: 0; top: 0;
+      height: 100%;
+      width: 0%;
+      background: var(--gradient-gold);
+      animation: loadProgress 1.5s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+    }
+    @keyframes loadProgress { to { width: 100%; } }
+    .preloader-text {
+      color: rgba(255,255,255,0.6);
+      margin-top: 0.75rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem 0;
+      z-index: 1000;
+      transition: var(--transition);
+      mix-blend-mode: difference;
+    }
+    .header.scrolled {
+      padding: 0.6rem 0;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      mix-blend-mode: normal;
+    }
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+    .logo img {
+      height: 40px;
+      width: auto;
+      filter: brightness(0) invert(1);
+    }
+    .header.scrolled .logo img {
+      filter: none;
+    }
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .header.scrolled .logo-text { color: var(--primary); }
+    .logo-text span { color: var(--accent); }
+    .nav { display: flex; gap: 1.75rem; list-style: none; }
+    .nav a {
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .header.scrolled .nav a { color: var(--primary); }
+    .header-cta { 
+      display: flex; 
+      align-items: center; 
+      gap: 0.875rem;
+    }
+    .phone-link {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--white);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+    .header.scrolled .phone-link { color: var(--primary); }
+    .phone-link i { width: 16px; height: 16px; }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-video {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(10, 25, 41, 0.85) 0%, rgba(26, 58, 82, 0.75) 100%);
+      z-index: 2;
+    }
+    .hero-particles {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 4;
+      text-align: center;
+      max-width: 850px;
+      padding: 0 2rem;
+      color: var(--white);
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 1.25rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(201, 169, 97, 0.3);
+      border-radius: 50px;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+    .hero-badge::after {
+      content: '';
+      width: 5px;
+      height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 0.5; }
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 7vw, 4.5rem);
+      line-height: 1.05;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 .line { display: block; }
+    .hero h1 .line:nth-child(2) {
+      font-style: italic;
+      color: var(--accent);
+      font-size: 0.65em;
+      margin-top: 0.5rem;
+    }
+    .hero-description {
+      font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 1.75rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 0.875rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.875rem 2rem;
+      background: var(--white);
+      color: var(--primary);
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      transition: var(--transition);
+      border: 2px solid transparent;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn:hover {
+      background: var(--gradient-gold);
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(201, 169, 97, 0.3);
+      color: var(--primary);
+    }
+    .btn-outline {
+      background: transparent;
+      border-color: var(--white);
+      color: var(--white);
+    }
+    .btn-outline:hover {
+      background: var(--white);
+      color: var(--primary);
+    }
+    .hero-scroll {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .hero-scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollLine 2s infinite;
+    }
+    @keyframes scrollLine {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      50.1% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ===== SECCIONES ===== */
+    .section {
+      padding: 3.5rem 0;
+      position: relative;
+    }
+    .section-dark { background: var(--primary); color: var(--white); }
+    .section-light { background: var(--white); }
+    .section-alt { background: var(--surface); }
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+    }
+    .section-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+    .section-tag {
+      display: inline-block;
+      padding: 0.35rem 1rem;
+      background: rgba(201, 169, 97, 0.15);
+      border: 1px solid var(--accent);
+      border-radius: 50px;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+    .section-dark .section-tag { background: rgba(201, 169, 97, 0.2); }
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4.5vw, 3rem);
+      line-height: 1.15;
+      margin-bottom: 0.75rem;
+    }
+    .section-header p {
+      font-size: 1rem;
+      color: var(--text-light);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+    .section-dark .section-header p { color: rgba(255,255,255,0.7); }
+
+    /* ===== ABOUT ===== */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .about-images {
+      position: relative;
+      height: 550px;
+    }
+    .about-img {
+      position: absolute;
+      border-radius: var(--radius-2xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-dramatic);
+    }
+    .about-img-1 { width: 70%; height: 55%; top: 0; left: 0; z-index: 2; }
+    .about-img-2 { width: 60%; height: 50%; bottom: 0; right: 0; z-index: 3; border: 5px solid var(--white); }
+    .about-img-3 { width: 40%; height: 35%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 4; border: 5px solid var(--accent); }
+    .about-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s;
+    }
+    .about-img:hover img { transform: scale(1.1); }
+    .about-content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      margin-bottom: 1rem;
+      line-height: 1.15;
+    }
+    .about-content h2 span { color: var(--accent); font-style: italic; }
+    .about-text {
+      font-size: 1rem;
+      color: var(--text-light);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .about-stat {
+      text-align: center;
+      padding: 1.25rem 0.75rem;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--surface-dark);
+    }
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: block;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .about-values {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.875rem;
+    }
+    .value-item {
+      display: flex;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .value-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gradient-gold);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+    .value-text strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 0.15rem;
+      font-size: 0.95rem;
+    }
+    .value-text span {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      line-height: 1.35;
+    }
+
+    /* ===== SERVICIOS ===== */
+    .services { padding: 3.5rem 0; }
+    .services-wrapper { 
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .services-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+    .services-horizontal {
+      display: flex;
+      gap: 1.25rem;
+      padding: 0.75rem 2.5rem;
+      width: max-content;
+    }
+    .service-card {
+      width: 360px;
+      height: 500px;
+      position: relative;
+      border-radius: var(--radius-2xl);
+      overflow: hidden;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .service-card-bg {
+      position: absolute;
+      inset: 0;
+      background: var(--gradient-dark);
+    }
+    .service-card-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.6;
+      transition: opacity 0.5s, transform 0.8s;
+    }
+    .service-card:hover .service-card-img {
+      opacity: 0.4;
+      transform: scale(1.08);
+    }
+    .service-card-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1.75rem;
+      background: linear-gradient(to top, rgba(10, 25, 41, 0.98), transparent);
+      color: var(--white);
+    }
+    .service-icon {
+      width: 55px;
+      height: 55px;
+      background: var(--gradient-gold);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+    }
+    .service-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      margin-bottom: 0.6rem;
+    }
+    .service-card p {
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .service-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.75rem;
+    }
+    .service-link:hover { color: var(--white); }
+
+    /* ===== GALERÍA ===== */
+    .gallery { background: var(--primary); padding: 3.5rem 0; }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 250px;
+      gap: 1rem;
+    }
+    .gallery-item {
+      position: relative;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .gallery-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+    .gallery-item:nth-child(4) { grid-column: span 2; }
+    .gallery-item:nth-child(5) { grid-row: span 2; }
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s;
+    }
+    .gallery-item:hover img { transform: scale(1.12); }
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10, 25, 41, 0.9), transparent);
+      opacity: 0;
+      transition: opacity 0.5s;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 1.5rem;
+      color: var(--white);
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+    .gallery-overlay h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      margin-bottom: 0.3rem;
+    }
+    .gallery-overlay p {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.85rem;
+    }
+
+    /* ===== TESTIMONIOS ===== */
+    .testimonials { background: var(--surface); padding: 3.5rem 0; }
+    .testimonials-carousel {
+      position: relative;
+      height: 450px;
+      perspective: 1000px;
+    }
+    .testimonial-slide {
+      position: absolute;
+      width: 500px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: all 0.7s;
+      pointer-events: none;
+    }
+    .testimonial-slide.active {
+      opacity: 1;
+      transform: translateX(-50%) translateZ(0);
+      pointer-events: all;
+    }
+    .testimonial-slide.prev {
+      opacity: 0.3;
+      transform: translateX(-150%) translateZ(-200px) rotateY(15deg);
+    }
+    .testimonial-slide.next {
+      opacity: 0.3;
+      transform: translateX(50%) translateZ(-200px) rotateY(-15deg);
+    }
+    .testimonial-card {
+      background: var(--white);
+      border-radius: var(--radius-2xl);
+      padding: 2rem;
+      box-shadow: var(--shadow-dramatic);
+      text-align: center;
+    }
+    .testimonial-stars {
+      color: var(--accent);
+      font-size: 1.1rem;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.25rem;
+    }
+    .testimonial-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem;
+      font-style: italic;
+      line-height: 1.45;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.875rem;
+    }
+    .author-avatar {
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--accent);
+    }
+    .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .author-info strong {
+      display: block;
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 0.15rem;
+    }
+    .author-info span { color: var(--text-light); font-size: 0.8rem; }
+    .testimonials-nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.625rem;
+      margin-top: 1.5rem;
+    }
+    .testimonials-btn {
+      width: 45px;
+      height: 45px;
+      border: 2px solid var(--primary);
+      border-radius: 50%;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    .testimonials-btn:hover {
+      background: var(--primary);
+      color: var(--white);
+      transform: scale(1.08);
+    }
+
+    /* ===== CONTACTO ===== */
+    .contact { background: var(--white); padding: 3.5rem 0; }
+    .contact::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 35%;
+      background: var(--gradient-dark);
+      z-index: 0;
+    }
+    .contact-container {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 0;
+      background: var(--white);
+      border-radius: var(--radius-2xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-dramatic);
+    }
+    .contact-info {
+      background: var(--gradient-dark);
+      padding: 2.5rem;
+      color: var(--white);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .contact-info h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .contact-info > p {
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 2rem; /* ESPACIO AÑADIDO AQUÍ */
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .contact-details { display: flex; flex-direction: column; gap: 1.25rem; }
+    .contact-item { display: flex; gap: 1rem; align-items: flex-start; }
+    .contact-icon {
+      width: 45px;
+      height: 45px;
+      background: rgba(201, 169, 97, 0.2);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+    .contact-text strong {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .contact-text span, .contact-text a {
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      line-height: 1.4;
+      display: block;
+      font-size: 0.85rem;
+    }
+    .contact-form-wrapper { padding: 2.5rem; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .form-group { margin-bottom: 1rem; position: relative; }
+    .form-control {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid var(--surface-dark);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      background: var(--surface);
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.1);
+      background: var(--white);
+    }
+    textarea.form-control { min-height: 100px; resize: vertical; }
+    .form-label {
+      position: absolute;
+      left: 1rem;
+      top: 0.875rem;
+      color: var(--text-light);
+      pointer-events: none;
+      transition: var(--transition);
+      font-size: 0.9rem;
+    }
+    .form-control:focus + .form-label,
+    .form-control:not(:placeholder-shown) + .form-label {
+      top: -0.45rem;
+      left: 0.75rem;
+      font-size: 0.7rem;
+      background: var(--white);
+      padding: 0 0.35rem;
+      color: var(--accent);
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--gradient-gold);
+      color: var(--primary);
+      border: none;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(201, 169, 97, 0.3);
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: var(--primary);
+      color: rgba(255,255,255,0.8);
+      padding: 3rem 0 1.25rem;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .footer-brand .logo {
+      margin-bottom: 0.875rem;
+      display: inline-flex;
+    }
+    .footer-brand .logo img {
+      height: 35px;
+      filter: brightness(0) invert(1);
+    }
+    .footer-brand p { margin-bottom: 1.25rem; line-height: 1.6; max-width: 320px; font-size: 0.85rem; }
+    .footer-social { display: flex; gap: 0.625rem; }
+    .social-link {
+      width: 38px;
+      height: 38px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .social-link:hover {
+      background: var(--gradient-gold);
+      border-color: var(--accent);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .footer-links h4 {
+      color: var(--white);
+      margin-bottom: 1.25rem;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .footer-links ul { list-style: none; }
+    .footer-links a {
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      padding: 0.4rem 0;
+      transition: var(--transition);
+      font-size: 0.85rem;
+    }
+    .footer-links a:hover { color: var(--accent); padding-left: 1rem; }
+    .footer-bottom {
+      padding-top: 1.75rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1024px) {
+      .about-grid, .contact-container { grid-template-columns: 1fr; }
+      .about-images { height: 450px; order: -1; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      body { cursor: auto; }
+      .cursor, .cursor-follower { display: none; }
+    }
+    @media (max-width: 768px) {
+      .header-inner {
+        padding: 0 1.25rem;
+      }
+      .nav { display: none; }
+      .header-cta {
+        gap: 0.75rem;
+      }
+      .phone-link {
+        font-size: 0.75rem;
+      }
+      .phone-link span {
+        display: none; /* Ocultar número en móvil muy pequeño */
+      }
+      .btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.7rem;
+      }
+      .footer-grid { grid-template-columns: 1fr; text-align: center; }
+      .footer-brand p { margin: 0 auto 1.25rem; }
+      .footer-social { justify-content: center; }
+      .footer-bottom { flex-direction: column; gap: 0.625rem; text-align: center; }
+      .service-card { width: 280px; height: 450px; }
+      .services-horizontal {
+        padding: 0.75rem 1.25rem;
+      }
+      .form-row { grid-template-columns: 1fr; }
+      .contact-info, .contact-form-wrapper { padding: 1.75rem; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .gallery-item:nth-child(1), .gallery-item:nth-child(4), .gallery-item:nth-child(5) { 
+        grid-column: span 1; grid-row: span 1;
+      }
+      .about-images { height: 400px; }
+      .about-img-1 { width: 75%; height: 50%; }
+      .about-img-2 { width: 65%; height: 45%; }
+      .about-img-3 { width: 45%; height: 35%; }
+    }
+    @media (max-width: 480px) {
+      .phone-link span {
+        display: none;
+      }
+      .hero h1 {
+        font-size: 2rem;
+      }
+      .hero-description {
+        font-size: 0.95rem;
+      }
+      .btn {
+        padding: 0.7rem 1rem;
+        font-size: 0.65rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor"></div>
+  <div class="cursor-follower"></div>
+
+  <div class="preloader" id="preloader">
+    <div class="preloader-logo">POLIKLINIK</div>
+    <div class="preloader-bar"><div class="preloader-progress"></div></div>
+    <div class="preloader-text">Cargando</div>
+  </div>
+
+  <header class="header" id="header">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <!-- REEMPLAZA "logo.png" CON LA RUTA DE TU LOGO -->
+        <img src="logo.png" alt="POLIKLINIK Logo">
+        <span class="logo-text">POLI<span>KLINIK</span></span>
+      </a>
+      <nav>
+        <ul class="nav">
+          <li><a href="#about">Nosotros</a></li>
+          <li><a href="#services">Servicios</a></li>
+          <li><a href="#gallery">Galería</a></li>
+          <li><a href="#testimonials">Testimonios</a></li>
+          <li><a href="#contact">Contacto</a></li>
+        </ul>
+      </nav>
+      <div class="header-cta">
+        <a href="tel:+34928391952" class="phone-link">
+          <i data-lucide="phone" style="width:16px;height:16px"></i>
+          <span>928 391 952</span>
+        </a>
+        <a href="#contact" class="btn"><span>Contáctanos</span></a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <video class="hero-video" autoplay muted loop playsinline>
+      <source src="clinica.mp4" type="video/mp4">
+    </video>
+    <div class="hero-bg"></div>
+    <canvas class="hero-particles" id="heroParticles"></canvas>
+    
+    <div class="hero-content">
+      <div class="hero-badge"><span>Excelencia Médica desde 2004</span></div>
+      <h1>
+        <div class="line">Cuidamos de Ti</div>
+        <div class="line">con Ciencia y Corazón</div>
+      </h1>
+      <p class="hero-description">
+        Más de 20 años brindando atención médica integral en Playa Blanca. 
+        Tecnología de vanguardia y trato humano.
+      </p>
+      <div class="hero-cta">
+        <a href="#services" class="btn"><span>Servicios</span><i data-lucide="arrow-right" style="width:14px;height:14px"></i></a>
+        <a href="tel:+34928391952" class="btn btn-outline"><span>Urgencias 24h</span></a>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="hero-scroll-line"></div>
+    </div>
+  </section>
+
+  <section class="section section-light about" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-images">
+          <!-- 
+          INSTRUCCIONES PARA LAS FOTOS:
+          1. about-img-1.jpg - Foto principal grande (70% width) - Instala ciones/Recepción de la clínica
+          2. about-img-2.jpg - Foto mediana (60% width) - Equipo médico sonriendo
+          3. about-img-3.jpg - Foto pequeña (40% width) - Tecnología/Equipamiento médico
+          
+          Coloca estas 3 fotos en la misma carpeta que el HTML
+          -->
+          <div class="about-img about-img-1">
+            <img src="about-img-1.jpg" alt="Instalaciones POLIKLINIK" onerror="this.src='https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?auto=format&fit=crop&w=800&q=80'">
+          </div>
+          <div class="about-img about-img-2">
+            <img src="about-img-2.jpg" alt="Equipo médico" onerror="this.src='https://images.unsplash.com/photo-1666224494127-8b1e27b4f4d4?auto=format&fit=crop&w=800&q=80'">
+          </div>
+          <div class="about-img about-img-3">
+            <img src="about-img-3.jpg" alt="Tecnología médica" onerror="this.src='https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?auto=format&fit=crop&w=600&q=80'">
+          </div>
+        </div>
+        
+        <div class="about-content">
+          <div class="section-tag" style="text-align:left;display:inline-block">Sobre Nosotros</div>
+          <h2>Medicina con <span>Propósito</span> y <span>Pasión</span></h2>
+          <p class="about-text">
+            Desde 2004, somos referentes en Lanzarote. Nuestro compromiso es tratar a cada paciente 
+            con dedicación, transparencia y calidez. Contamos con 2 centros en Playa Blanca.
+          </p>
+          
+          <div class="about-stats">
+            <div class="about-stat"><span class="stat-number" data-count="20">0</span><span class="stat-label">Años</span></div>
+            <div class="about-stat"><span class="stat-number" data-count="3500">0</span><span class="stat-label">Pacientes</span></div>
+            <div class="about-stat"><span class="stat-number" data-count="20">0</span><span class="stat-label">Hoteles</span></div>
+          </div>
+
+          <div class="about-values">
+            <div class="value-item"><div class="value-icon">✨</div><div class="value-text"><strong>Transparencia</strong><span>Sin tecnicismos, te guiamos.</span></div></div>
+            <div class="value-item"><div class="value-icon">⚡</div><div class="value-text"><strong>Eficacia</strong><span>Atención rápida. Todos VIP.</span></div></div>
+            <div class="value-item"><div class="value-icon">🤝</div><div class="value-text"><strong>Amabilidad</strong><span>Una sonrisa es medicina.</span></div></div>
+            <div class="value-item"><div class="value-icon">🏆</div><div class="value-text"><strong>Excelencia</strong><span>Tecnología vanguardia.</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-dark services" id="services">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Servicios</div>
+        <h2>Excelencia Médica Integral</h2>
+        <p>Atención especializada con enfoque personalizado en Playa Blanca.</p>
+      </div>
+    </div>
+    
+    <div class="services-wrapper">
+      <div class="services-horizontal" id="servicesHorizontal">
+        <div class="service-card">
+          <div class="service-card-bg"></div>
+          <img src="https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?auto=format&fit=crop&w=600&q=80" alt="Medicina General" class="service-card-img">
+          <div class="service-card-content">
+            <div class="service-icon">🩺</div>
+            <h3>Medicina General</h3>
+            <p>Diagnóstico y tratamiento de afecciones: infecciones, dolores musculares, cuidados pediátricos.</p>
+            <a href="#contact" class="service-link">Solicitar <i data-lucide="arrow-right" style="width:12px;height:12px"></i></a>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-bg"></div>
+          <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=600&q=80" alt="Ortodoncia" class="service-card-img">
+          <div class="service-card-content">
+            <div class="service-icon">✨</div>
+            <h3>Ortodoncia Invisible</h3>
+            <p>Transforma tu sonrisa con Invisalign. Alineación dental discreta y efectiva.</p>
+            <a href="#contact" class="service-link">Descubre <i data-lucide="arrow-right" style="width:12px;height:12px"></i></a>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-bg"></div>
+          <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80" alt="Urgencias" class="service-card-img">
+          <div class="service-card-content">
+            <div class="service-icon">🚨</div>
+            <h3>Urgencias 24/7</h3>
+            <p>Atención médica inmediata las 24 horas. Nos desplazamos a tu ubicación.</p>
+            <a href="tel:+34928391952" class="service-link">Llamar <i data-lucide="phone" style="width:12px;height:12px"></i></a>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-bg"></div>
+          <img src="https://images.unsplash.com/photo-1530497610245-27e28a79c55c?auto=format&fit=crop&w=600&q=80" alt="Patologías" class="service-card-img">
+          <div class="service-card-content">
+            <div class="service-icon">🦴</div>
+            <h3>Patologías Articulares</h3>
+            <p>Recupera tu movilidad con tratamientos avanzados para dolores articulares.</p>
+            <a href="#contact" class="service-link">Agendar <i data-lucide="arrow-right" style="width:12px;height:12px"></i></a>
+          </div>
+        </div>
+
+        <div class="service-card">
+          <div class="service-card-bg"></div>
+          <img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=600&q=80" alt="Odontología" class="service-card-img">
+          <div class="service-card-content">
+            <div class="service-icon">🦷</div>
+            <h3>Odontología</h3>
+            <p>Cuidado completo de tu salud bucal: prevención, estética dental, implantes.</p>
+            <a href="#contact" class="service-link">Reservar <i data-lucide="arrow-right" style="width:12px;height:12px"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section gallery" id="gallery">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag" style="background:rgba(255,255,255,0.1);color:var(--white)">Galería</div>
+        <h2 style="color:var(--white)">Nuestras Instalaciones</h2>
+        <p style="color:rgba(255,255,255,0.7)">Espacios diseñados para tu confort.</p>
+      </div>
+      
+      <div class="gallery-grid">
+        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1200&q=80" alt="Recepción"><div class="gallery-overlay"><h3>Recepción</h3><p>Espacios confortables</p></div></div>
+        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&w=800&q=80" alt="Consulta"><div class="gallery-overlay"><h3>Consultas</h3><p>Tecnología avanzada</p></div></div>
+        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=800&q=80" alt="Equipo"><div class="gallery-overlay"><h3>Equipo</h3><p>Profesionales cualificados</p></div></div>
+        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=1200&q=80" alt="Tecnología"><div class="gallery-overlay"><h3>Tecnología</h3><p>Equipamiento vanguardia</p></div></div>
+        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1666224494127-8b1e27b4f4d4?auto=format&fit=crop&w=800&q=80" alt="Tratamiento"><div class="gallery-overlay"><h3>Tratamiento</h3><p>Espacios seguros</p></div></div>
+        <div class="gallery-item"><img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80" alt="Vistas"><div class="gallery-overlay"><h3>Ubicación</h3><p>Playa Blanca</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section testimonials" id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">Testimonios</div>
+        <h2>Historias de Éxito</h2>
+        <p>Lo que dicen nuestros pacientes.</p>
+      </div>
+      
+      <div class="testimonials-carousel" id="testimonialsCarousel">
+        <div class="testimonial-slide active">
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">"Excelente servicio médico. El precio en relación a la atención es súper especial. Lo recomiendo."</p>
+            <div class="testimonial-author">
+              <div class="author-avatar"><img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80" alt="Lien"></div>
+              <div class="author-info"><strong>Lien Gonzales</strong><span>Medicina General</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-slide next">
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">"Clínica recomendable. Me realizaron una infiltración y me alivié al 100%. Atención muy agradable."</p>
+            <div class="testimonial-author">
+              <div class="author-avatar"><img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80" alt="Mónica"></div>
+              <div class="author-info"><strong>Mónica Romero</strong><span>Patologías Articulares</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-slide">
+          <div class="testimonial-card">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">"Can highly recommend. Developed an infection whilst on holiday, was seen and treated immediately. Excellent!"</p>
+            <div class="testimonial-author">
+              <div class="author-avatar"><img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" alt="Lindsay"></div>
+              <div class="author-info"><strong>Lindsay T.</strong><span>Paciente Internacional</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonials-nav">
+        <button class="testimonials-btn" id="prevTestimonial"><i data-lucide="arrow-left" style="width:18px;height:18px"></i></button>
+        <button class="testimonials-btn" id="nextTestimonial"><i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section contact" id="contact">
+    <div class="container">
+      <div class="contact-container">
+        <div class="contact-info">
+          <div>
+            <h3>Agenda tu Cita</h3>
+            <p>Tu salud no espera. Contáctanos y recibe atención personalizada.</p>
+            
+            <div class="contact-details">
+              <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <div class="contact-text"><strong>Ubicación</strong><span>Av. de Papagayo, 32<br>35580 Playa Blanca</span></div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">📞</div>
+                <div class="contact-text"><strong>Teléfonos</strong><a href="tel:+34928391952">928 391 952</a><a href="tel:+34659032810">659 032 810 (Urgencias)</a></div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">✉️</div>
+                <div class="contact-text"><strong>Email</strong><a href="mailto:info@poliklinik.es">info@poliklinik.es</a></div>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">🕐</div>
+                <div class="contact-text"><strong>Horario</strong><span>Lun-Vie: 9:00 - 20:00<br>Sáb: 10:00 - 14:00</span></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="footer-social" style="margin-top:1.5rem">
+            <a href="#" class="social-link"><span>📷</span></a>
+            <a href="#" class="social-link"><span>📘</span></a>
+            <a href="#" class="social-link"><span>🔍</span></a>
+          </div>
+        </div>
+
+        <div class="contact-form-wrapper">
+          <form id="contactForm">
+            <div class="form-row">
+              <div class="form-group"><input type="text" id="name" class="form-control" placeholder=" " required><label for="name" class="form-label">Nombre *</label></div>
+              <div class="form-group"><input type="tel" id="phone" class="form-control" placeholder=" " required><label for="phone" class="form-label">Teléfono *</label></div>
+            </div>
+            <div class="form-group"><input type="email" id="email" class="form-control" placeholder=" " required><label for="email" class="form-label">Email *</label></div>
+            <div class="form-group">
+              <select id="service" class="form-control" style="cursor:pointer">
+                <option value="">Selecciona un servicio</option>
+                <option value="general">Medicina General</option>
+                <option value="dental">Odontología</option>
+                <option value="urgencias">Urgencias</option>
+                <option value="articular">Patologías Articulares</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+            <div class="form-group"><textarea id="message" class="form-control" placeholder=" "></textarea><label for="message" class="form-label">Mensaje</label></div>
+            <div class="form-group">
+              <label style="display:flex;align-items:flex-start;gap:0.5rem;cursor:pointer;color:var(--text-light);font-size:0.8rem">
+                <input type="checkbox" required style="margin-top:0.2rem;width:14px;height:14px;accent-color:var(--accent)">
+                <span>Acepto la <a href="#" style="color:var(--accent)">Política de Privacidad</a> *</span>
+              </label>
+            </div>
+            <button type="submit" class="submit-btn"><span>Enviar Solicitud</span></button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo">
+            <img src="logo.png" alt="POLIKLINIK Logo">
+          </a>
+          <p>Excelencia médica en Lanzarote desde 2004.</p>
+          <div class="footer-social">
+            <a href="#" class="social-link"><span>📷</span></a>
+            <a href="#" class="social-link"><span>📘</span></a>
+            <a href="#" class="social-link"><span>🔍</span></a>
+          </div>
+        </div>
+        <div class="footer-links">
+          <h4>Servicios</h4>
+          <ul>
+            <li><a href="#services">Medicina General</a></li>
+            <li><a href="#services">Odontología</a></li>
+            <li><a href="#services">Urgencias 24/7</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Clínica</h4>
+          <ul>
+            <li><a href="#about">Sobre Nosotros</a></li>
+            <li><a href="#gallery">Galería</a></li>
+            <li><a href="#testimonials">Testimonios</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Aviso Legal</a></li>
+            <li><a href="#">Privacidad</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 POLIKLINIK. Todos los derechos reservados.</p>
+        <p>Diseñado con <span style="color:var(--accent)">❤</span></p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      // CURSOR
+      const cursor = document.querySelector('.cursor');
+      const cursorFollower = document.querySelector('.cursor-follower');
+      
+      document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX - 8 + 'px';
+        cursor.style.top = e.clientY - 8 + 'px';
+        setTimeout(() => {
+          cursorFollower.style.left = e.clientX - 16 + 'px';
+          cursorFollower.style.top = e.clientY - 16 + 'px';
+        }, 0);
+      });
+
+      const interactiveElements = document.querySelectorAll('a, button, .service-card, .gallery-item');
+      interactiveElements.forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+      });
+
+      // PRELOADER
+      const preloader = document.getElementById('preloader');
+      setTimeout(() => {
+        preloader.classList.add('hidden');
+        initHeroAnimations();
+      }, 1600);
+
+      function initHeroAnimations() {
+        gsap.from('.hero-badge', { opacity: 0, y: 20, duration: 0.6, ease: 'power3.out' });
+        gsap.from('.hero h1 .line', { opacity: 0, y: 30, duration: 0.8, stagger: 0.15, ease: 'power3.out', delay: 0.2 });
+        gsap.from('.hero-description', { opacity: 0, y: 20, duration: 0.6, ease: 'power3.out', delay: 0.5 });
+        gsap.from('.hero-cta', { opacity: 0, y: 20, duration: 0.6, ease: 'power3.out', delay: 0.7 });
+      }
+
+      // LENIS
+      const lenis = new Lenis({ duration: 0.8, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smooth: true });
+      function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+      requestAnimationFrame(raf);
+
+      gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+      // HEADER
+      const header = document.getElementById('header');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 80) header.classList.add('scrolled');
+        else header.classList.remove('scrolled');
+      });
+
+      // COUNTERS
+      const counters = document.querySelectorAll('[data-count]');
+      counters.forEach(counter => {
+        const target = parseInt(counter.dataset.count);
+        ScrollTrigger.create({
+          trigger: counter, start: 'top 85%', once: true,
+          onEnter: () => {
+            gsap.to(counter, {
+              innerHTML: target, duration: 1.5, ease: 'power2.out',
+              snap: { innerHTML: 1 },
+              onUpdate: function() { counter.innerHTML = Math.ceil(this.targets()[0].innerHTML); }
+            });
+          }
+        });
+      });
+
+      // SERVICES HORIZONTAL SCROLL - Desktop only
+      if (window.innerWidth > 768) {
+        const servicesSection = document.querySelector('.services');
+        const servicesHorizontal = document.getElementById('servicesHorizontal');
+        const scrollWidth = servicesHorizontal.scrollWidth - window.innerWidth;
+        
+        gsap.to(servicesHorizontal, {
+          x: () => -scrollWidth + 150,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: servicesSection,
+            start: 'top top',
+            end: () => `+=${scrollWidth}`,
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1
+          }
+        });
+      }
+
+      // GALLERY
+      const galleryItems = document.querySelectorAll('.gallery-item');
+      galleryItems.forEach((item, i) => {
+        gsap.from(item, {
+          scrollTrigger: { trigger: item, start: 'top 90%' },
+          y: 50, opacity: 0, duration: 0.6, delay: i * 0.06, ease: 'power3.out'
+        });
+      });
+
+      // TESTIMONIALS
+      const slides = document.querySelectorAll('.testimonial-slide');
+      let currentSlide = 0;
+      
+      function updateSlides() {
+        slides.forEach((slide, index) => {
+          slide.classList.remove('active', 'prev', 'next');
+          if (index === currentSlide) slide.classList.add('active');
+          else if (index === (currentSlide - 1 + slides.length) % slides.length) slide.classList.add('prev');
+          else if (index === (currentSlide + 1) % slides.length) slide.classList.add('next');
+        });
+      }
+
+      document.getElementById('nextTestimonial').addEventListener('click', () => {
+        currentSlide = (currentSlide + 1) % slides.length;
+        updateSlides();
+      });
+
+      document.getElementById('prevTestimonial').addEventListener('click', () => {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        updateSlides();
+      });
+
+      setInterval(() => {
+        currentSlide = (currentSlide + 1) % slides.length;
+        updateSlides();
+      }, 5000);
+
+      // FORM
+      document.getElementById('contactForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('.submit-btn');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<span>Enviando...</span>';
+        btn.disabled = true;
+        
+        setTimeout(() => {
+          btn.innerHTML = '<span>✓ ¡Enviado!</span>';
+          btn.style.background = '#22c55e';
+          setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+            btn.style.background = '';
+            e.target.reset();
+            alert('¡Gracias! Te contactaremos pronto.');
+          }, 1500);
+        }, 1200);
+      });
+
+      // SMOOTH SCROLL
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            gsap.to(window, { duration: 1, scrollTo: { y: target, offsetY: 60 }, ease: 'power3.inOut' });
+          }
+        });
+      });
+
+      // PARTICLES
+      initParticles();
+      
+      function initParticles() {
+        const canvas = document.getElementById('heroParticles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+        class Particle {
+          constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = Math.random() * 0.4 - 0.2;
+            this.speedY = Math.random() * 0.4 - 0.2;
+            this.color = `rgba(201, 169, 97, ${Math.random() * 0.5})`;
+          }
+          update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x > canvas.width) this.x = 0;
+            if (this.x < 0) this.x = canvas.width;
+            if (this.y > canvas.height) this.y = 0;
+            if (this.y < 0) this.y = canvas.height;
+          }
+          draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        for (let i = 0; i < 70; i++) particles.push(new Particle());
+
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+            for (let j = i; j < particles.length; j++) {
+              const dx = particles[i].x - particles[j].x;
+              const dy = particles[i].y - particles[j].y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              if (distance < 100) {
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(201, 169, 97, ${0.1 * (1 - distance / 100)})`;
+                ctx.lineWidth = 0.5;
+                ctx.moveTo(particles[i].x, particles[i].y);
+                ctx.lineTo(particles[j].x, particles[j].y);
+                ctx.stroke();
+              }
+            }
+          }
+          requestAnimationFrame(animate);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        });
+      }
+    });
+  </script>
+</body>
+</html>
